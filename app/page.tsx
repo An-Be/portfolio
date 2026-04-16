@@ -257,8 +257,8 @@ export default function Home() {
 
       <div className="pointer-events-none fixed bottom-4 right-4 z-30 flex items-center gap-2 sm:bottom-6 sm:right-6">
         <div className="h-6 w-6 rounded-sm border border-black/15 bg-(--color-tertiary) sm:h-7 sm:w-7" />
-        <div className="h-6 w-6 rounded-sm border border-black/15 bg-(--color-secondary) sm:h-7 sm:w-7" />
         <div className="h-6 w-6 rounded-sm border border-black/15 bg-(--color-primary) sm:h-7 sm:w-7" />
+        <div className="h-6 w-6 rounded-sm border border-black/15 bg-(--color-secondary) sm:h-7 sm:w-7" />
       </div>
     </div>
   );
