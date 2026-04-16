@@ -19,9 +19,9 @@ export const metadata: Metadata = {
   title: "Andrea Berrocal",
   description: "Experience Designer — coming soon",
   icons: {
-    icon: "/images/roller.svg",
-    shortcut: "/images/roller.svg",
-    apple: "/images/roller.svg",
+    icon: "/images/icon.svg",
+    shortcut: "/images/icon.svg",
+    apple: "/images/icon.svg",
   },
 };
 
