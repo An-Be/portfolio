@@ -225,8 +225,8 @@ export default function Home() {
 
           {/* Name — above subtitle when scattered; inline z-index helps mobile compositing */}
           <motion.h1
-            className="relative text-5xl font-sans text-primary font-stretch-normal uppercase leading-[1.2] select-none md:text-7xl lg:text-8xl sm:font-stretch-expanded lg:font-stretch-ultra-expanded"
-            style={{ zIndex: scattered && !isCoarsePointer ? 35 : 10 }}
+            className="relative text-5xl font-sans text-primary font-stretch-normal uppercase leading-[1.2] md:leading-[1.32] lg:leading-[1.42] xl:leading-normal select-none md:text-7xl lg:text-8xl sm:font-stretch-expanded lg:font-stretch-ultra-expanded"
+            style={{ zIndex: 10 }}
             initial={false}
             animate={{ opacity: scattered ? 0.88 : 1 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
