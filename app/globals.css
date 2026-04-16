@@ -1,25 +1,58 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fff8f0;
-  --color-primary: #ff8811;
-  --color-secondary: #392f5a;
+  --background: #e6e8e6;
+  /* Palette tokens avoid circular @theme refs; aliases keep var(--color-*) working */
+  --palette-primary: #3772ff;
+  --palette-secondary: #df2935;
+  --palette-tertiary: #fdca40;
+  --color-primary: var(--palette-primary);
+  --color-secondary: var(--palette-secondary);
+  --color-tertiary: var(--palette-tertiary);
 }
 
 @theme inline {
   --color-background: var(--background);
-  --color-primary: var(--color-primary);
-  --color-secondary: var(--color-secondary);
+  --color-primary: var(--palette-primary);
+  --color-secondary: var(--palette-secondary);
+  --color-tertiary: var(--palette-tertiary);
   --font-sans: var(--font-sigmar-one);
   --font-serif: var(--font-cormorant-garamond);
 }
 
 body {
   background: var(--background);
-  color: var(--color-secondary);
+}
+
+/* Whole-name idle motion (no per-letter wrappers — avoids mobile stacking issues) */
+@keyframes name-ripple {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  33% {
+    transform: translateY(-2.5px);
+  }
+  66% {
+    transform: translateY(2px);
+  }
+}
+
+.animate-name-ripple {
+  will-change: transform;
+  animation: name-ripple 2.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-name-ripple {
+    animation: none;
+    will-change: auto;
+  }
 }
 
 /* Hide default cursor on desktop — replaced by custom icon cursor */
 @media (pointer: fine) {
-  * { cursor: none !important; }
+  * {
+    cursor: none !important;
+  }
 }
