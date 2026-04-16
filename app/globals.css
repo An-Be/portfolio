@@ -1,26 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fff8f0;
+  --color-primary: #ff8811;
+  --color-secondary: #392f5a;
 }
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-primary: var(--color-primary);
+  --color-secondary: var(--color-secondary);
+  --font-sans: var(--font-sigmar-one);
+  --font-serif: var(--font-cormorant-garamond);
 }
 
 body {
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--color-secondary);
+}
+
+/* Hide default cursor on desktop — replaced by custom icon cursor */
+@media (pointer: fine) {
+  * { cursor: none !important; }
 }
