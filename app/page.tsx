@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import RippleGrid from "./components/RippleGrid";
 
 const NAME = "Andrea Berrocal";
+const NAME_WORDS = NAME.split(" ");
+const LETTER_COUNT = NAME.replace(/\s/g, "").length;
 
 type ScatterOffset = { x: number; y: number };
 
@@ -25,7 +27,7 @@ const createScatterOffsets = ({
   const deadzoneX = Math.max(110, base * (isCoarsePointer ? 0.34 : 0.28));
   const deadzoneY = Math.max(80, base * (isCoarsePointer ? 0.25 : 0.22));
 
-  return NAME.split("").map(() => {
+  return Array.from({ length: LETTER_COUNT }, () => {
     let x = 0;
     let y = 0;
 
@@ -133,6 +135,15 @@ export default function Home() {
     };
   }, []);
 
+  let letterIndex = 0;
+  const wordsWithOffsets = NAME_WORDS.map((word) =>
+    word.split("").map((letter) => {
+      const offset = scatterOffsets[letterIndex] ?? { x: 0, y: 0 };
+      letterIndex += 1;
+      return { letter, offset };
+    }),
+  );
+
   return (
     <div className="relative flex flex-col flex-1 items-center justify-center overflow-hidden">
       <RippleGrid />
@@ -160,17 +171,21 @@ export default function Home() {
           </motion.div>
 
           {/* Name layer — letters scatter on hover */}
-          <h1 className="relative text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-sans text-primary font-stretch-normal sm:font-stretch-expanded lg:font-stretch-ultra-expanded uppercase leading-none select-none">
-            {NAME.split("").map((letter, i) => (
-              <RepelLetter
-                key={i}
-                scattered={scattered}
-                scatterX={scatterOffsets[i].x}
-                scatterY={scatterOffsets[i].y}
-                scaleY={scaleY}
-              >
-                {letter}
-              </RepelLetter>
+          <h1 className="relative flex flex-wrap justify-center gap-x-[0.25em] text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-sans text-primary font-stretch-normal sm:font-stretch-expanded lg:font-stretch-ultra-expanded uppercase leading-[1.2] select-none">
+            {wordsWithOffsets.map((word, wordIdx) => (
+              <span key={wordIdx} className="inline-flex whitespace-nowrap">
+                {word.map(({ letter, offset }, letterIdx) => (
+                  <RepelLetter
+                    key={`${wordIdx}-${letterIdx}`}
+                    scattered={scattered}
+                    scatterX={offset.x}
+                    scatterY={offset.y}
+                    scaleY={scaleY}
+                  >
+                    {letter}
+                  </RepelLetter>
+                ))}
+              </span>
             ))}
           </h1>
         </div>
