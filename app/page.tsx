@@ -179,7 +179,7 @@ export default function Home() {
             }}
           >
             <p className="text-lg font-bold sm:text-2xl font-serif text-secondary">
-              Designer
+              Experience Designer
             </p>
             <p className="text-3xl font-sans text-secondary sm:text-5xl">
               <span className="relative inline-block pb-2">

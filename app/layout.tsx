@@ -17,7 +17,7 @@ const cormorantGaramond = Cormorant_Garamond({
 
 export const metadata: Metadata = {
   title: "Andrea Berrocal",
-  description: "Experience Designer — coming soon",
+  description: "Experience Designer",
   icons: {
     icon: "/images/icon.svg",
     shortcut: "/images/icon.svg",
