@@ -26,6 +26,7 @@ const createScatterOffsets = ({
   const maxDist = Math.max(140, base * (isCoarsePointer ? 0.38 : 0.52));
   const deadzoneX = Math.max(110, base * (isCoarsePointer ? 0.34 : 0.28));
   const deadzoneY = Math.max(80, base * (isCoarsePointer ? 0.25 : 0.22));
+  const deadzoneCenterY = -base * 0.08;
 
   return Array.from({ length: LETTER_COUNT }, () => {
     let x = 0;
@@ -54,7 +55,9 @@ const createScatterOffsets = ({
       x = clamp(x, -viewportWidth * 0.44, viewportWidth * 0.44);
       y = clamp(y, -viewportHeight * 0.34, viewportHeight * 0.34);
 
-      const inDeadzone = Math.abs(x) < deadzoneX && Math.abs(y) < deadzoneY;
+      const inDeadzone =
+        Math.abs(x) < deadzoneX &&
+        Math.abs(y - deadzoneCenterY) < deadzoneY;
       if (!inDeadzone) break;
     }
 
