@@ -178,12 +178,12 @@ export default function Home() {
               delay: scattered ? 0.08 : 0,
             }}
           >
-            <p className="text-lg font-bold sm:text-2xl font-serif text-secondary">
-              Experience Designer
-            </p>
+            {/* <p className="text-lg font-extrabold sm:text-2xl font-serif text-secondary">
+              Designer
+            </p> */}
             <p className="text-3xl font-sans text-secondary sm:text-5xl">
               <span className="relative inline-block pb-2">
-                Coming soon
+                Portfolio arriving soon...
                 <motion.svg
                   aria-hidden
                   className="pointer-events-none absolute inset-x-0 -bottom-0.5 z-50 h-4 w-full overflow-visible text-tertiary sm:h-5"
