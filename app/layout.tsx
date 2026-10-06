@@ -1,23 +1,32 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Sigmar_One } from "next/font/google";
+import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import Cursor from "./components/Cursor";
 
-const sigmarOne = Sigmar_One({
-  variable: "--font-sigmar-one",
-  weight: ["400"],
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  weight: ["500", "600", "700"],
   subsets: ["latin"],
 });
 
-const cormorantGaramond = Cormorant_Garamond({
-  variable: "--font-cormorant-garamond",
-  weight: ["400", "500", "600", "700"],
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  weight: ["400", "500", "600"],
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  weight: ["400", "500", "600"],
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Andrea Berrocal",
-  description: "Experience Designer",
+  title: {
+    default: "Andrea Berrocal",
+    template: "%s | Andrea Berrocal",
+  },
+  description: "I make complex products legible, to buyers, sellers, and everyone in between.",
   icons: {
     icon: "/images/icon.svg",
     shortcut: "/images/icon.svg",
@@ -33,7 +42,8 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${sigmarOne.variable} ${cormorantGaramond.variable} h-full antialiased`}
+      data-scroll-behavior="smooth"
+      className={`${spaceGrotesk.variable} ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Cursor />

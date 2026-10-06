@@ -1,265 +1,1128 @@
 "use client";
-import { motion, useMotionValue, useSpring } from "motion/react";
-import { useEffect, useId, useState } from "react";
-import RippleGrid from "./components/RippleGrid";
+import { useRef, useState, useEffect, useLayoutEffect } from "react";
+import Image from "next/image";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+import Nav from "./components/Nav";
+import Button from "./components/ui/Button";
+import Brush from "./components/Brush";
+import Tag from "./components/ui/Tag";
+import PaletteDock from "./components/PaletteDock";
+import Loader from "./components/Loader";
+import EntryTable, { type EntryRow } from "./components/EntryTable";
+import { PROJECTS, STATUS_META, type ProjectStatus } from "./lib/projects";
 
-const NAME = "Andrea Berrocal";
-const NAME_WORDS = NAME.split(" ");
-const LETTER_COUNT = NAME.replace(/\s/g, "").length;
-const FIRST_NAME_LETTER_COUNT = NAME_WORDS[0]?.length ?? 0;
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 
-type ScatterOffset = { x: number; y: number };
+const VIDEOS = ["/videos/100_2605.MOV", "/videos/lake-michigan.mov"];
+const LOADER_SEEN_KEY = "abp-loader-seen";
 
-const clamp = (value: number, min: number, max: number) =>
-  Math.min(max, Math.max(min, value));
+const SURFACES = [
+  "Link Agent Wallet",
+  "UCP",
+  "MPP",
+  "SPT",
+  "Connect",
+  "Stripe Terminal",
+  "Metronome",
+];
 
-const createScatterOffsets = ({
-  viewportWidth,
-  viewportHeight,
-  isCoarsePointer,
-}: {
-  viewportWidth: number;
-  viewportHeight: number;
-  isCoarsePointer: boolean;
-}): ScatterOffset[] => {
-  const base = Math.min(viewportWidth, viewportHeight);
-  const minDist = Math.max(80, base * (isCoarsePointer ? 0.2 : 0.28));
-  const maxDist = Math.max(140, base * (isCoarsePointer ? 0.38 : 0.52));
-  const deadzoneX = Math.max(110, base * (isCoarsePointer ? 0.34 : 0.28));
-  const deadzoneY = Math.max(80, base * (isCoarsePointer ? 0.25 : 0.22));
-  const deadzoneCenterY = -base * 0.08;
+const PROJECT_ROWS: EntryRow[] = PROJECTS.map((p) => {
+  const meta = STATUS_META[p.status];
+  return {
+    id: p.id,
+    title: p.title,
+    summary: p.summary,
+    focus: p.focus,
+    dotColor: meta.color,
+    dotFilled: meta.filled,
+  };
+});
 
-  return Array.from({ length: LETTER_COUNT }, (_, letterIndex) => {
-    let x = 0;
-    let y = 0;
+const STATUS_ORDER: ProjectStatus[] = ["concept", "build", "paused", "shipped"];
 
-    for (let tries = 0; tries < 30; tries++) {
-      // Split by first / last name so scatter goes both ways (left vs right).
-      const isFirstName = letterIndex < FIRST_NAME_LETTER_COUNT;
-      const band = isFirstName
-        ? Math.random() < 0.5
-          ? 0
-          : 2 // top-left or bottom-left → negative x
-        : Math.random() < 0.5
-          ? 1
-          : 3; // top-right or bottom-right → positive x
+/* ═══════════════════════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════════════════════ */
 
-      let deg: number;
-      if (band === 0)
-        deg = 120 + Math.random() * 45; // top-left
-      else if (band === 1)
-        deg = 15 + Math.random() * 45; // top-right
-      else if (band === 2)
-        deg = 195 + Math.random() * 45; // bottom-left
-      else deg = 300 + Math.random() * 45; // bottom-right
-
-      const angle = (deg * Math.PI) / 180;
-      const dist = minDist + Math.random() * (maxDist - minDist);
-
-      x = Math.cos(angle) * dist;
-      y = Math.sin(angle) * dist;
-
-      // Keep scatter visible across viewports, especially on mobile.
-      x = clamp(x, -viewportWidth * 0.44, viewportWidth * 0.44);
-      y = clamp(y, -viewportHeight * 0.34, viewportHeight * 0.34);
-
-      const inDeadzone =
-        Math.abs(x) < deadzoneX && Math.abs(y - deadzoneCenterY) < deadzoneY;
-      if (!inDeadzone) break;
-    }
-
-    return { x, y };
-  });
+type Logo = {
+  name: string;
+  tag?: string;
+  note: string;
+  tool?: string;
+  sketch?: string;
+  logo: string;
 };
 
-function RepelLetter({
-  children,
-  scattered,
-  scatterX,
-  scatterY,
-  scaleY,
-}: {
-  children: string;
-  scattered: boolean;
-  scatterX: number;
-  scatterY: number;
-  scaleY: number;
-}) {
-  const targetX = useMotionValue(0);
-  const targetY = useMotionValue(0);
-  const x = useSpring(targetX, { stiffness: 90, damping: 12 });
-  const y = useSpring(targetY, { stiffness: 90, damping: 12 });
+const LOGOS: Logo[] = [
+  {
+    name: "Dory",
+    tag: "Internal tool",
+    note: "Mascot for a teammate's internal tool.",
+    tool: "Hand-drawn → Claude → Illustrator",
+    sketch: "/images/cr-sketch.jpg",
+    logo: "/images/cr-mascot.png",
+  },
+  {
+    name: "Laptop Loft",
+    tag: "Demo brand",
+    note: "A fictional laptop shop. Its mark is, fittingly, a laptop.",
+    tool: "Figma",
+    logo: "/images/logo-laptoploft.png",
+  },
+  {
+    name: "City of Springfield",
+    tag: "Demo brand",
+    note: "A civic mark that plays on the name: a young plant in a field.",
+    tool: "Figma",
+    logo: "/images/logo-springfield.svg",
+  },
+  {
+    name: "Tahoe",
+    tag: "Demo brand",
+    note: "A peak and its mirrored reflection on the water, for Lake Tahoe.",
+    tool: "Figma",
+    logo: "/images/logo-tahoe.svg",
+  },
+];
 
-  useEffect(() => {
-    targetX.set(scattered ? scatterX : 0);
-    targetY.set(scattered ? scatterY : 0);
-  }, [scattered, scatterX, scatterY, targetX, targetY]);
+const timeline = [
+  {
+    year: "2024",
+    role: "Software Engineer, GTM and Marketing · Stripe",
+    note: "Architecting AI-powered demo systems: Agentic Commerce, Demo Hub, and 8+ global enterprise events a year. Chicago.",
+  },
+  {
+    year: "2022",
+    role: "Software Engineer · American Express",
+    note: "Built the Ask Amex customer-service chat UI in React & Redux, with real-time WebSocket messaging. Phoenix.",
+  },
+];
 
+const education = [
+  {
+    school: "School of the Art Institute of Chicago",
+    note: "Continuing Education · Intro to Graphic Design: formal design principles, typography, and visual hierarchy.",
+  },
+  { school: "Wilbur Wright College", note: "Associate of Arts · Chicago, IL" },
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   SHARED SUB-COMPONENTS
+═══════════════════════════════════════════════════════════════ */
+
+function Marquee() {
+  const items = [
+    "Design & Build",
+    "·",
+    "Chicago",
+    "·",
+    "Demos",
+    "·",
+    "Go-to-Market",
+    "·",
+    "Agentic Commerce",
+    "·",
+    "Tiny tools",
+    "·",
+    "✶",
+  ];
   return (
-    <motion.span
-      style={{ display: "inline-block", scaleY, x, y, touchAction: "none" }}
+    <div
+      style={{
+        overflow: "hidden",
+        background: "var(--accent-yellow)",
+        padding: "13px 0",
+      }}
     >
-      {children === " " ? "\u00A0" : children}
-    </motion.span>
+      <div className="marquee-track">
+        {[0, 1].map((n) => (
+          <span
+            key={n}
+            aria-hidden={n === 1}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 30,
+              fontFamily: "var(--font-mono)",
+              fontSize: 12,
+              fontWeight: 500,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "var(--palette-gray-900)",
+              paddingRight: 36,
+            }}
+          >
+            {items.map((item, i) => (
+              <span key={i}>{item}</span>
+            ))}
+            <Image
+              src="/images/tab-math-mark.svg"
+              alt=""
+              width={16}
+              height={16}
+              aria-hidden="true"
+              style={{
+                display: "block",
+                flexShrink: 0,
+              }}
+            />
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }
 
-export default function Home() {
-  const comingSoonUnderlineClipId = useId().replace(/:/g, "");
-  const [scattered, setScattered] = useState(false);
-  const [scaleY, setScaleY] = useState(2);
-  const [isCoarsePointer, setIsCoarsePointer] = useState(false);
-  const [scatterOffsets, setScatterOffsets] = useState<ScatterOffset[]>(() =>
-    createScatterOffsets({
-      viewportWidth: 1280,
-      viewportHeight: 800,
-      isCoarsePointer: false,
-    }),
+function Field({
+  label,
+  type = "text",
+  value,
+  onChange,
+  textarea,
+}: {
+  label: string;
+  type?: string;
+  value: string;
+  onChange: (v: string) => void;
+  textarea?: boolean;
+}) {
+  const style: React.CSSProperties = {
+    fontFamily: "var(--font-serif)",
+    fontSize: 18,
+    padding: "11px 14px",
+    border: `1px solid ${value ? "var(--border-ink)" : "var(--border-default)"}`,
+    borderRadius: "var(--radius-md)",
+    background: "transparent",
+    color: "var(--text-default)",
+    outline: "none",
+    resize: "vertical",
+    width: "100%",
+    boxSizing: "border-box",
+    transition: "border-color var(--duration-fast) var(--ease-out)",
+  };
+  return (
+    <label
+      className="contact-field"
+      style={{ display: "flex", flexDirection: "column", gap: 8 }}
+    >
+      <span className="t-label" style={{ color: "var(--text-subtle)" }}>
+        {label}
+      </span>
+      {textarea ? (
+        <textarea
+          rows={4}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          style={style}
+        />
+      ) : (
+        <input
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          style={style}
+        />
+      )}
+    </label>
   );
+}
 
+/* ═══════════════════════════════════════════════════════════════
+   PAGE
+═══════════════════════════════════════════════════════════════ */
+
+export default function Home() {
+  const [loaded, setLoaded] = useState(false);
+  const [name, setName] = useState(""),
+    [email, setEmail] = useState(""),
+    [msg, setMsg] = useState(""),
+    [sent, setSent] = useState(false);
+  const mainRef = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
+  const turbulenceRef = useRef<SVGFETurbulenceElement>(null);
+  const displacementRef = useRef<SVGFEDisplacementMapElement>(null);
+
+  // Skip the loader if it already played earlier this session — runs before
+  // paint so there's no flash of it on client-side navigations back to "/"
+  useLayoutEffect(() => {
+    if (sessionStorage.getItem(LOADER_SEEN_KEY) === "1") {
+      setLoaded(true);
+    }
+  }, []);
+
+  // Force scroll to top on a plain load — prevents browser scroll restoration
+  // from landing mid-page. Skipped when the URL has a hash (e.g. /#projects)
+  // so anchor navigation isn't fought.
   useEffect(() => {
-    const pointerQuery = window.matchMedia("(pointer: coarse)");
-    const update = () => {
-      const coarse = pointerQuery.matches;
-      setIsCoarsePointer(coarse);
-      setScaleY(
-        window.innerWidth < 640 ? 1.35 : window.innerWidth < 1024 ? 1.6 : 2,
-      );
-      setScatterOffsets(
-        createScatterOffsets({
-          viewportWidth: window.innerWidth,
-          viewportHeight: window.innerHeight,
-          isCoarsePointer: coarse,
-        }),
-      );
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    if (!window.location.hash) {
+      window.scrollTo(0, 0);
+    }
+  }, []);
+
+  // Video distortion on hero hover
+  useEffect(() => {
+    const hero = heroRef.current;
+    const turbulence = turbulenceRef.current;
+    const displacement = displacementRef.current;
+    if (!hero || !turbulence || !displacement) return;
+
+    const onMove = (e: MouseEvent) => {
+      const r = hero.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width;
+      const y = (e.clientY - r.top) / r.height;
+      gsap.to(displacement, {
+        attr: { scale: 38 },
+        duration: 0.35,
+        ease: "power2.out",
+        overwrite: true,
+      });
+      gsap.to(turbulence, {
+        attr: { baseFrequency: `${0.008 + x * 0.016} ${0.006 + y * 0.014}` },
+        duration: 0.55,
+        ease: "power1.out",
+        overwrite: true,
+      });
+    };
+    const onLeave = () => {
+      gsap.to(displacement, {
+        attr: { scale: 0 },
+        duration: 0.8,
+        ease: "power2.inOut",
+        overwrite: true,
+      });
+      gsap.to(turbulence, {
+        attr: { baseFrequency: "0.015 0.015" },
+        duration: 0.8,
+        overwrite: true,
+      });
     };
 
-    update();
-    window.addEventListener("resize", update);
-    pointerQuery.addEventListener("change", update);
-
+    hero.addEventListener("mousemove", onMove);
+    hero.addEventListener("mouseleave", onLeave);
     return () => {
-      window.removeEventListener("resize", update);
-      pointerQuery.removeEventListener("change", update);
+      hero.removeEventListener("mousemove", onMove);
+      hero.removeEventListener("mouseleave", onLeave);
     };
   }, []);
 
-  let letterIndex = 0;
-  const wordsWithOffsets = NAME_WORDS.map((word) =>
-    word.split("").map((letter) => {
-      const offset = scatterOffsets[letterIndex] ?? { x: 0, y: 0 };
-      letterIndex += 1;
-      return { letter, offset };
-    }),
+  // GSAP scroll-triggered entrance animations
+  useGSAP(
+    () => {
+      if (!loaded) return;
+
+      // #7 Hero name letter stagger
+      gsap.from(".hero-letter", {
+        yPercent: 110,
+        opacity: 0,
+        duration: 0.7,
+        stagger: 0.035,
+        ease: "power3.out",
+      });
+
+      // #5 Section heading clip/wipe reveal
+      gsap.utils.toArray<HTMLElement>(".section-heading").forEach((el) => {
+        gsap.from(el, {
+          clipPath: "inset(0 0 100% 0)",
+          y: 16,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: { trigger: el, start: "top 88%", once: true },
+        });
+      });
+
+      // #6 Timeline draw-in
+      const timelineLine =
+        document.querySelector<HTMLElement>(".timeline-line");
+      if (timelineLine) {
+        gsap.from(timelineLine, {
+          scaleY: 0,
+          transformOrigin: "top center",
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".timeline-container",
+            start: "top 72%",
+            end: "bottom 65%",
+            scrub: 1.5,
+          },
+        });
+      }
+
+      // #2 Creative gallery horizontal pin
+      const creativeSection = document.querySelector<HTMLElement>("#creative");
+      const creativeTrack =
+        document.querySelector<HTMLElement>(".creative-track");
+      if (creativeSection && creativeTrack) {
+        const scrollDist = creativeTrack.scrollWidth - window.innerWidth;
+        if (scrollDist > 0) {
+          gsap.to(creativeTrack, {
+            x: -scrollDist,
+            ease: "none",
+            scrollTrigger: {
+              trigger: creativeSection,
+              pin: true,
+              start: "top top",
+              end: `+=${scrollDist}`,
+              scrub: 1,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
+            },
+          });
+        }
+      }
+
+      gsap.utils.toArray<HTMLElement>(".logo-card").forEach((card) => {
+        gsap.fromTo(
+          card,
+          { y: 36, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.55,
+            ease: "power2.out",
+            scrollTrigger: { trigger: card, start: "top 88%", once: true },
+          },
+        );
+      });
+
+      gsap.utils.toArray<HTMLElement>(".timeline-row").forEach((row, i) => {
+        gsap.fromTo(
+          row,
+          { x: -28, opacity: 0 },
+          {
+            x: 0,
+            opacity: 1,
+            duration: 0.55,
+            ease: "power2.out",
+            delay: i * 0.08,
+            scrollTrigger: { trigger: row, start: "top 88%", once: true },
+          },
+        );
+      });
+
+      gsap.utils.toArray<HTMLElement>(".edu-row").forEach((row, i) => {
+        gsap.fromTo(
+          row,
+          { x: -28, opacity: 0 },
+          {
+            x: 0,
+            opacity: 1,
+            duration: 0.55,
+            ease: "power2.out",
+            delay: i * 0.08,
+            scrollTrigger: { trigger: row, start: "top 88%", once: true },
+          },
+        );
+      });
+
+      gsap.utils.toArray<HTMLElement>(".contact-field").forEach((el, i) => {
+        gsap.fromTo(
+          el,
+          { y: 24, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.5,
+            ease: "power2.out",
+            delay: i * 0.07,
+            scrollTrigger: { trigger: el, start: "top 90%", once: true },
+          },
+        );
+      });
+
+      ScrollTrigger.refresh();
+    },
+    { scope: mainRef, dependencies: [loaded] },
   );
 
+  // Marquee speed tied to scroll velocity
+  useEffect(() => {
+    const track = document.querySelector<HTMLElement>(".marquee-track");
+    if (!track) return;
+
+    const tl = gsap.timeline({ repeat: -1 });
+    tl.to(track, { x: "-50%", duration: 36, ease: "none" });
+
+    let lastVel = 0;
+    let lastY = window.scrollY;
+    let lastT = performance.now();
+
+    const onScroll = () => {
+      const now = performance.now();
+      const dt = now - lastT;
+      if (dt > 0) lastVel = (Math.abs(window.scrollY - lastY) / dt) * 1000;
+      lastY = window.scrollY;
+      lastT = now;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    const tickerFn = () => {
+      lastVel *= 0.88;
+      tl.timeScale(1 + lastVel / 900);
+    };
+    gsap.ticker.add(tickerFn);
+
+    return () => {
+      tl.kill();
+      window.removeEventListener("scroll", onScroll);
+      gsap.ticker.remove(tickerFn);
+    };
+  }, []);
+
+  const sectionPad: React.CSSProperties = {
+    padding: "clamp(60px, 8vw, 120px) clamp(24px, 6vw, 80px)",
+  };
+
+  const divider: React.CSSProperties = {
+    height: 1,
+    background: "var(--border-default)",
+    margin: "44px 0 32px",
+  };
+
   return (
-    <div className="relative flex flex-col flex-1 items-center justify-center overflow-hidden">
-      <RippleGrid />
+    <>
+      {!loaded && (
+        <Loader
+          onDone={() => {
+            sessionStorage.setItem(LOADER_SEEN_KEY, "1");
+            setLoaded(true);
+          }}
+        />
+      )}
 
-      <main className="relative z-10 flex flex-1 w-full max-w-screen-2xl flex-col items-center text-center justify-center px-4 sm:px-10 lg:px-10">
-        {/* Container that holds both layers */}
-        <div
-          className="relative isolate flex items-center justify-center px-16 py-12 sm:px-24 sm:py-16 lg:px-32 lg:py-24"
-          onPointerEnter={() => !isCoarsePointer && setScattered(true)}
-          onPointerLeave={() => !isCoarsePointer && setScattered(false)}
-          onClick={() => isCoarsePointer && setScattered((value) => !value)}
+      <div ref={mainRef}>
+        <Nav />
+
+        {/* ─────────────────────────────────────────────────────────
+            HERO
+        ───────────────────────────────────────────────────────── */}
+        <section
+          ref={heroRef}
+          id="hero"
+          style={{
+            height: "100svh",
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
+          }}
         >
-          {/* Subtitle — content-sized only (inset-0 was a full-bleed layer that hid scattered letters on mobile WebKit) */}
-          <motion.div
-            className="pointer-events-none absolute left-1/2 top-1/2 z-20 flex w-max max-w-[min(92vw,24rem)] -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-3 px-2"
-            initial={false}
-            animate={{
-              opacity: scattered ? 1 : 0,
-            }}
-            transition={{
-              duration: 0.4,
-              ease: "easeOut",
-              delay: scattered ? 0.08 : 0,
-            }}
+          {/* SVG displacement filter */}
+          <svg
+            style={{ position: "absolute", width: 0, height: 0 }}
+            aria-hidden
           >
-            {/* <p className="text-lg font-extrabold sm:text-2xl font-serif text-secondary">
-              Designer
-            </p> */}
-            <p className="text-3xl font-sans text-secondary sm:text-5xl">
-              <span className="relative inline-block pb-2">
-                Portfolio arriving soon...
-                <motion.svg
-                  aria-hidden
-                  className="pointer-events-none absolute inset-x-0 -bottom-0.5 z-50 h-4 w-full overflow-visible text-tertiary sm:h-5"
-                  viewBox="0 0 100 14"
-                  preserveAspectRatio="none"
-                >
-                  <defs>
-                    <clipPath
-                      id={comingSoonUnderlineClipId}
-                      clipPathUnits="userSpaceOnUse"
-                    >
-                      <motion.rect
-                        x={0}
-                        y={0}
-                        height={14}
-                        initial={{ width: 0 }}
-                        animate={{ width: scattered ? 100 : 0 }}
-                        transition={{
-                          duration: scattered ? 1.1 : 0.22,
-                          ease: scattered
-                            ? [0.22, 0.05, 0.32, 1]
-                            : [0.4, 0, 1, 1],
-                          delay: scattered ? 0.22 : 0,
-                        }}
-                      />
-                    </clipPath>
-                  </defs>
-                  <g clipPath={`url(#${comingSoonUnderlineClipId})`}>
-                    {/* Single filled ribbon: thick at start, tapers to a tip (brush stroke) */}
-                    <path
-                      fill="currentColor"
-                      d="M0,3.6 C38,2.4 72,5.2 100,6.18 L100,6.32 C71,8.2 36,11.2 0,10.2 Z"
-                    />
-                  </g>
-                </motion.svg>
-              </span>
-            </p>
-          </motion.div>
+            <defs>
+              <filter
+                id="video-distort"
+                x="-20%"
+                y="-20%"
+                width="140%"
+                height="140%"
+              >
+                <feTurbulence
+                  ref={turbulenceRef}
+                  type="turbulence"
+                  baseFrequency="0.015 0.015"
+                  numOctaves="3"
+                  seed="2"
+                  result="noise"
+                />
+                <feDisplacementMap
+                  ref={displacementRef}
+                  in="SourceGraphic"
+                  in2="noise"
+                  scale="0"
+                  xChannelSelector="R"
+                  yChannelSelector="G"
+                />
+              </filter>
+            </defs>
+          </svg>
 
-          {/* Name — above subtitle when scattered; inline z-index helps mobile compositing */}
-          <motion.h1
-            className="relative text-5xl font-sans text-primary font-stretch-normal uppercase leading-[1.2] md:leading-[1.32] lg:leading-[1.42] xl:leading-normal select-none md:text-7xl lg:text-8xl sm:font-stretch-expanded lg:font-stretch-ultra-expanded"
-            style={{ zIndex: 10 }}
-            initial={false}
-            animate={{ opacity: scattered ? 0.88 : 1 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
+          {/* Name strip — white background */}
+          <div
+            style={{
+              paddingTop: 88,
+              paddingBottom: 16,
+              paddingLeft: "clamp(20px, 5vw, 56px)",
+              paddingRight: "clamp(20px, 5vw, 56px)",
+              background: "var(--surface-page)",
+              flexShrink: 0,
+            }}
           >
-            {/* Ripple on inner node: motion on <h1> can override CSS transform on the same element */}
-            <span
-              className={`flex w-full min-w-0 flex-wrap justify-center gap-x-[0.25em] ${!scattered ? "animate-name-ripple" : ""}`}
+            <h1
+              className="hero-name"
+              style={{
+                margin: 0,
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(1.75rem, 8.5vw, 7rem)",
+                fontWeight: 400,
+                textTransform: "uppercase",
+                lineHeight: 0.92,
+                letterSpacing: "0.01em",
+                color: "var(--text-display)",
+                overflow: "hidden",
+                textAlign: "center",
+              }}
             >
-              {wordsWithOffsets.map((word, wordIdx) => (
-                <span key={wordIdx} className="inline-flex whitespace-nowrap">
-                  {word.map(({ letter, offset }, letterIdx) => (
-                    <RepelLetter
-                      key={`${wordIdx}-${letterIdx}`}
-                      scattered={scattered}
-                      scatterX={offset.x}
-                      scatterY={offset.y}
-                      scaleY={scaleY}
-                    >
-                      {letter}
-                    </RepelLetter>
-                  ))}
+              {"Andrea Berrocal".split("").map((ch, i) => (
+                <span
+                  key={i}
+                  className="hero-letter"
+                  style={{ display: "inline-block" }}
+                >
+                  {ch === " " ? " " : ch}
                 </span>
               ))}
-            </span>
-          </motion.h1>
-        </div>
-      </main>
+            </h1>
+          </div>
 
-      <div className="pointer-events-none fixed bottom-4 right-4 z-30 flex items-center gap-2 sm:bottom-6 sm:right-6">
-        <div className="h-6 w-6 rounded-sm border border-black/15 bg-(--color-tertiary) sm:h-7 sm:w-7" />
-        <div className="h-6 w-6 rounded-sm border border-black/15 bg-(--color-primary) sm:h-7 sm:w-7" />
-        <div className="h-6 w-6 rounded-sm border border-black/15 bg-(--color-secondary) sm:h-7 sm:w-7" />
+          {/* Video area — fills remaining height */}
+          <div style={{ flex: 1 }}>
+            <div
+              style={{
+                position: "relative",
+                overflow: "hidden",
+                height: "100%",
+                background: "#1d2130",
+              }}
+            >
+              <video
+                src={VIDEOS[0]}
+                autoPlay
+                muted
+                loop
+                playsInline
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  zIndex: 0,
+                  filter: "url(#video-distort)",
+                }}
+              />
+              <div
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  zIndex: 1,
+                  pointerEvents: "none",
+                  background:
+                    "radial-gradient(120% 90% at 50% 44%, transparent 38%, rgba(20,24,34,0.45) 100%)",
+                }}
+              />
+
+              {/* Tagline + CTAs */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  zIndex: 10,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 26,
+                  padding: "0 24px",
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    fontFamily: "var(--font-serif)",
+                    fontSize: "clamp(1.15rem, 2.4vw, 1.9rem)",
+                    fontWeight: 500,
+                    lineHeight: 1.4,
+                    color: "#000",
+                    textShadow: "0 1px 14px rgba(0,0,0,0.5)",
+                    maxWidth: "24ch",
+                    textAlign: "center",
+                  }}
+                >
+                  I make complex products legible,
+                  <br />
+                  to buyers, sellers, and everyone in between.
+                </p>
+                <div style={{ display: "flex", gap: 14 }}>
+                  <Button variant="primary" href="#projects">
+                    View Projects
+                  </Button>
+                </div>
+              </div>
+
+              {/* Scroll cue */}
+              <div
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  bottom: 24,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  zIndex: 10,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 7,
+                  color: "rgba(244,239,228,0.85)",
+                  fontFamily: "var(--font-mono)",
+                  textTransform: "uppercase",
+                  fontSize: 11,
+                  letterSpacing: "0.12em",
+                  textShadow: "0 1px 8px rgba(0,0,0,.5)",
+                }}
+              >
+                <span>Scroll</span>
+                <svg
+                  width="14"
+                  height="22"
+                  viewBox="0 0 14 22"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                >
+                  <rect x="1" y="1" width="12" height="20" rx="6" />
+                  <path
+                    d="M7 6v3"
+                    style={{ animation: "vhCue 1.8s ease-in-out infinite" }}
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <Marquee />
+
+        {/* ─────────────────────────────────────────────────────────
+            PROJECTS
+        ───────────────────────────────────────────────────────── */}
+        <section id="projects" style={{ position: "relative", zIndex: 10 }}>
+          <div
+            style={{
+              background: "var(--surface-sunken)",
+              padding:
+                "clamp(56px, 7vw, 96px) clamp(24px, 6vw, 80px) clamp(48px, 6vw, 72px)",
+            }}
+          >
+            <span className="t-label eyebrow">Side Projects</span>
+            <h2
+              className="t-h1 section-heading"
+              style={{ margin: "6px 0 10px", maxWidth: 720 }}
+            >
+              Things I build{" "}
+              <Brush color="var(--accent-blue)">for myself</Brush>
+            </h2>
+            <p
+              className="t-body-lg"
+              style={{
+                maxWidth: 560,
+                marginTop: 14,
+                color: "var(--text-subtle)",
+              }}
+            >
+              Small, exact tools for the parts of life that run on trust.
+            </p>
+          </div>
+
+          <div style={sectionPad}>
+            <div
+              style={{
+                display: "flex",
+                gap: 18,
+                alignItems: "center",
+                flexWrap: "wrap",
+                marginBottom: 18,
+              }}
+            >
+              {STATUS_ORDER.map((status) => {
+                const meta = STATUS_META[status];
+                return (
+                  <span
+                    key={status}
+                    style={{ display: "flex", alignItems: "center", gap: 7 }}
+                  >
+                    <span
+                      className="entry-dot"
+                      style={
+                        meta.filled
+                          ? { background: meta.color, borderColor: meta.color }
+                          : {
+                              background: "transparent",
+                              borderColor: meta.color,
+                            }
+                      }
+                    />
+                    <span className="t-caption">{meta.label}</span>
+                  </span>
+                );
+              })}
+            </div>
+            <EntryTable items={PROJECT_ROWS} hrefBase="/projects/" />
+          </div>
+        </section>
+
+        {/* ─────────────────────────────────────────────────────────
+            CREATIVE
+        ───────────────────────────────────────────────────────── */}
+        <section
+          id="creative"
+          style={{ position: "relative", zIndex: 10, overflow: "hidden" }}
+        >
+          <div
+            className="creative-track"
+            style={{ display: "flex", willChange: "transform" }}
+          >
+            {[
+              // {
+              //   src: "/images/cr-mascot.png",
+              //   label: "Dory · mascot",
+              // },
+              {
+                src: "/images/mim-postcard.png",
+                label: "MIM · postcard · SAIC coursework",
+              },
+              {
+                src: "/images/mim-business-card.png",
+                label: "MIM · business card · SAIC coursework",
+              },
+              {
+                src: "/images/bose-headset.jpg",
+                label: "Bose · product study",
+              },
+              {
+                src: "/images/bose-me.jpg",
+                label: "Bose · portrait",
+              },
+              {
+                src: "/images/river-under-bridge.jpg",
+                label: "Riverwalk · Clark Street bridge",
+              },
+              {
+                src: "/images/river-stairs.jpg",
+                label: "Riverwalk steps · Chicago, winter",
+              },
+              {
+                src: "/images/river-ice.jpg",
+                label: "Chicago River · ice, in pieces",
+              },
+            ].map(({ src, label }) => (
+              <figure
+                key={src}
+                style={{
+                  margin: 0,
+                  flexShrink: 0,
+                  width: "100vw",
+                  height: "100svh",
+                  position: "relative",
+                  overflow: "hidden",
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={src}
+                  alt={label}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    display: "block",
+                  }}
+                />
+                <figcaption
+                  className="t-caption"
+                  style={{
+                    position: "absolute",
+                    bottom: "clamp(20px, 3vw, 36px)",
+                    left: "clamp(24px, 4vw, 56px)",
+                    textShadow: "0 1px 8px rgba(0,0,0,0.6)",
+                  }}
+                >
+                  {label}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+
+        {/* ─────────────────────────────────────────────────────────
+            ABOUT
+        ───────────────────────────────────────────────────────── */}
+        <section id="about" style={{ position: "relative", zIndex: 10 }}>
+          <div style={sectionPad}>
+            <div className="about-copy" style={{ width: "100%" }}>
+              <span className="t-label eyebrow">About</span>
+              <h2
+                className="t-h1 section-heading"
+                style={{ margin: "6px 0 22px", maxWidth: 680 }}
+              >
+                I design the system{" "}
+                <Brush color="var(--accent-blue)">and</Brush> build it
+              </h2>
+              <p className="t-body-lg" style={{ marginTop: 0 }}>
+                I&apos;m Andrea. I work where engineering meets go-to-market:
+                translating complex products into systems that technical and
+                non-technical stakeholders can both trust. I started out
+                shipping production front-end at American Express; now at
+                Stripe, I architect the demo environments and self-serve tools
+                that let global sales and solutions-architecture teams sell
+                complex products without needing an engineer in the room.
+              </p>
+              <p className="t-body-lg">
+                That work has helped influence $265M+ (and climbing) in pipeline
+                across 2025 and 2026. I care about the layer most companies
+                leave to chance: the one between what engineering built and the
+                people who have to sell it, demo it, and trust it. That&apos;s
+                where I do my best work.
+              </p>
+
+              <div style={divider} />
+
+              <span className="t-label eyebrow">What I Build</span>
+              <p className="t-body-lg" style={{ marginTop: 18 }}>
+                Day to day, I own demo experiences across Stripe&apos;s product
+                surface: Agentic, Billing, Payments, Connect, Terminal, and
+                everything in between. Global events, enterprise GTM calls, and
+                the self-serve tools that let sales teams run without an
+                engineer in the room. Every product has its own constraints,
+                audience, and failure modes. That's the part I actually enjoy.
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 10,
+                  margin: "22px 0 24px",
+                }}
+              >
+                {SURFACES.map((s) => (
+                  <Tag key={s}>{s}</Tag>
+                ))}
+              </div>
+              <Button variant="outline" href="#projects">
+                See my projects
+              </Button>
+
+              <div style={divider} />
+
+              <span className="t-label eyebrow">Timeline</span>
+              <div
+                className="timeline-container"
+                style={{ marginTop: 18, position: "relative" }}
+              >
+                <div
+                  className="timeline-line"
+                  style={{
+                    position: "absolute",
+                    left: 68,
+                    top: 20,
+                    width: 1.5,
+                    bottom: 20,
+                    background: "var(--accent-red)",
+                    transformOrigin: "top center",
+                  }}
+                />
+                {timeline.map((t, i) => (
+                  <div
+                    key={i}
+                    className="timeline-row"
+                    style={{
+                      display: "flex",
+                      gap: 28,
+                      padding: "16px 0",
+                      borderBottom: "1px dashed var(--border-default)",
+                    }}
+                  >
+                    <span
+                      className="t-label timeline-year"
+                      style={{
+                        color: "var(--accent-red)",
+                        minWidth: 56,
+                        paddingTop: 4,
+                      }}
+                    >
+                      {t.year}
+                    </span>
+                    <div>
+                      <h3 className="t-h3" style={{ margin: "0 0 2px" }}>
+                        {t.role}
+                      </h3>
+                      <p className="t-caption" style={{ margin: 0 }}>
+                        {t.note}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={divider} />
+
+              <span className="t-label eyebrow">Education</span>
+              <div style={{ marginTop: 18 }}>
+                {education.map((e, i) => (
+                  <div
+                    key={i}
+                    className="edu-row"
+                    style={{
+                      padding: "14px 0",
+                      borderBottom: "1px dashed var(--border-default)",
+                    }}
+                  >
+                    <h3 className="t-h3" style={{ margin: "0 0 3px" }}>
+                      {e.school}
+                    </h3>
+                    <p className="t-caption" style={{ margin: 0 }}>
+                      {e.note}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ marginTop: 40 }}>
+                <Button variant="pinned" href="#contact">
+                  Get in touch
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ─────────────────────────────────────────────────────────
+            CONTACT
+        ───────────────────────────────────────────────────────── */}
+        {/* <div style={{ position: "relative", zIndex: 10, height: "56vh", overflow: "hidden", borderTop: "1.5px solid var(--border-default)", borderBottom: "1.5px solid var(--border-default)" }}>
+          <video autoPlay muted loop playsInline src="/videos/lake-michigan.mov"
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+        </div> */}
+
+        <section id="contact" style={{ position: "relative", zIndex: 10 }}>
+          <div style={sectionPad}>
+            <div style={{ width: "100%" }}>
+              <span className="t-label eyebrow">Contact</span>
+              <h2
+                className="t-h1 section-heading"
+                style={{ margin: "6px 0 10px" }}
+              >
+                Tell me what you&apos;re{" "}
+                <Brush color="var(--accent-yellow)">building</Brush>
+              </h2>
+              <p className="t-body-lg" style={{ marginTop: 12 }}>
+                Product work, a design system that&apos;s drifting, or something
+                you can&apos;t quite name yet. I&apos;m interested.
+              </p>
+
+              {sent ? (
+                <div
+                  className="fade-up"
+                  style={{
+                    marginTop: 40,
+                    padding: 28,
+                    border: "1px solid var(--border-ink)",
+                    borderRadius: "var(--radius-lg)",
+                  }}
+                >
+                  <h3 className="t-h2" style={{ margin: "0 0 6px" }}>
+                    Got it, thank you.
+                  </h3>
+                  <p className="t-body" style={{ margin: 0 }}>
+                    I&apos;ll be in touch within a day or two.
+                  </p>
+                </div>
+              ) : (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setSent(true);
+                  }}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 22,
+                    marginTop: 36,
+                  }}
+                >
+                  <Field label="Name" value={name} onChange={setName} />
+                  <Field
+                    label="Email"
+                    type="email"
+                    value={email}
+                    onChange={setEmail}
+                  />
+                  <Field
+                    label="What's on your mind"
+                    textarea
+                    value={msg}
+                    onChange={setMsg}
+                  />
+                  <div
+                    className="contact-actions"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 18,
+                      marginTop: 4,
+                    }}
+                  >
+                    <Button variant="primary" type="submit">
+                      Send it
+                    </Button>
+                    <span className="t-caption">
+                      or email info@andreaberrocal.com
+                    </span>
+                  </div>
+                </form>
+              )}
+
+              <div style={{ height: 80 }} />
+            </div>
+          </div>
+        </section>
+
+        {/* <PaletteDock /> */}
+
+        <footer
+          className="site-footer"
+          style={{
+            background: "var(--surface-sunken)",
+            borderTop: "1px solid var(--border-default)",
+            padding: "22px clamp(24px, 6vw, 80px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 12,
+          }}
+        >
+          <span className="t-label" style={{ color: "var(--text-default)" }}>
+            Andrea Berrocal
+          </span>
+          <div
+            className="site-footer-links"
+            style={{
+              display: "flex",
+              gap: 24,
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            <a
+              href="mailto:info@andreaberrocal.com"
+              className="t-caption"
+              style={{ color: "var(--text-subtle)", textDecoration: "none" }}
+            >
+              info@andreaberrocal.com
+            </a>
+            <span className="t-label" style={{ color: "var(--text-subtle)" }}>
+              © 2026
+            </span>
+          </div>
+        </footer>
       </div>
-    </div>
+    </>
   );
 }
