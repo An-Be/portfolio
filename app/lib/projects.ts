@@ -52,7 +52,7 @@ export const PROJECTS: Project[] = [
     year: "2026",
     focus: "Fairness",
     summary:
-      "Split the bill in 60 seconds. Snap the receipt, tap who had what, send everyone a link. No app, no login for your friends, no money moving through me.",
+      "Split the bill in 60 seconds. Snap the receipt, tap who had what, send everyone a link with their total. No app, no login for your friends, no money moving through me.",
     stack: [
       "Next.js 16",
       "Gemini",
@@ -66,13 +66,13 @@ export const PROJECTS: Project[] = [
     sections: [
       {
         h: "What it does",
-        p: "One person starts a split, no account required (guest sessions work out of the box, and if they sign up later their split comes with them automatically). They upload a photo of the receipt. Gemini reads the image and extracts the line items, tax, and tip, so nothing gets typed in by hand. Everyone else opens a shareable link, picks their own name, and taps the items that are theirs, or just splits the whole thing evenly. The dashboard shows who owes what and who's already paid.",
+        p: "One person starts a split, no account required (guest sessions work out of the box, and if they sign up later their split comes with them automatically). They upload a photo of the receipt. Gemini reads the image and extracts the line items, tax, and tip, so nothing gets typed in by hand. The organizer taps who had what, or just splits the whole thing evenly. Everyone else opens a shareable link, picks their name, and sees only what they owe, with a button that hands off to the organizer's Venmo, Cash App, Zelle, or Stripe link. The dashboard shows who owes what and who's already paid.",
       },
       {
         h: "A few details I cared about",
         p: [
           "Re-uploading the same receipt photo doesn't re-call the model or duplicate line items. The image is hashed, and a repeat hash just reuses what was already extracted.",
-          "Participants never create an account. The split lives behind a share token, so picking your items and marking yourself paid both work with no login.",
+          "Participants never create an account. The split lives behind a share token, so finding your name and seeing your total works with no login.",
           "The math is exact to the cent. Tax and tip get prorated by each person's share of the subtotal, and any leftover penny from rounding gets handed out one at a time instead of disappearing or getting double counted.",
           "Rate limiting runs on the same Postgres database instead of a separate Redis instance, since the volume never justified standing up another service.",
         ],
