@@ -244,8 +244,6 @@ export default function Home() {
     [sent, setSent] = useState(false);
   const mainRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
-  const turbulenceRef = useRef<SVGFETurbulenceElement>(null);
-  const displacementRef = useRef<SVGFEDisplacementMapElement>(null);
 
   // Skip the loader if it already played earlier this session — runs before
   // paint so there's no flash of it on client-side navigations back to "/"
@@ -263,52 +261,6 @@ export default function Home() {
     if (!window.location.hash) {
       window.scrollTo(0, 0);
     }
-  }, []);
-
-  // Video distortion on hero hover
-  useEffect(() => {
-    const hero = heroRef.current;
-    const turbulence = turbulenceRef.current;
-    const displacement = displacementRef.current;
-    if (!hero || !turbulence || !displacement) return;
-
-    const onMove = (e: MouseEvent) => {
-      const r = hero.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width;
-      const y = (e.clientY - r.top) / r.height;
-      gsap.to(displacement, {
-        attr: { scale: 38 },
-        duration: 0.35,
-        ease: "power2.out",
-        overwrite: true,
-      });
-      gsap.to(turbulence, {
-        attr: { baseFrequency: `${0.008 + x * 0.016} ${0.006 + y * 0.014}` },
-        duration: 0.55,
-        ease: "power1.out",
-        overwrite: true,
-      });
-    };
-    const onLeave = () => {
-      gsap.to(displacement, {
-        attr: { scale: 0 },
-        duration: 0.8,
-        ease: "power2.inOut",
-        overwrite: true,
-      });
-      gsap.to(turbulence, {
-        attr: { baseFrequency: "0.015 0.015" },
-        duration: 0.8,
-        overwrite: true,
-      });
-    };
-
-    hero.addEventListener("mousemove", onMove);
-    hero.addEventListener("mouseleave", onLeave);
-    return () => {
-      hero.removeEventListener("mousemove", onMove);
-      hero.removeEventListener("mouseleave", onLeave);
-    };
   }, []);
 
   // GSAP scroll-triggered entrance animations
@@ -511,39 +463,6 @@ export default function Home() {
             overflow: "hidden",
           }}
         >
-          {/* SVG displacement filter */}
-          <svg
-            style={{ position: "absolute", width: 0, height: 0 }}
-            aria-hidden
-          >
-            <defs>
-              <filter
-                id="video-distort"
-                x="-20%"
-                y="-20%"
-                width="140%"
-                height="140%"
-              >
-                <feTurbulence
-                  ref={turbulenceRef}
-                  type="turbulence"
-                  baseFrequency="0.015 0.015"
-                  numOctaves="3"
-                  seed="2"
-                  result="noise"
-                />
-                <feDisplacementMap
-                  ref={displacementRef}
-                  in="SourceGraphic"
-                  in2="noise"
-                  scale="0"
-                  xChannelSelector="R"
-                  yChannelSelector="G"
-                />
-              </filter>
-            </defs>
-          </svg>
-
           {/* Name strip — white background */}
           <div
             style={{
@@ -606,7 +525,6 @@ export default function Home() {
                   height: "100%",
                   objectFit: "cover",
                   zIndex: 0,
-                  filter: "url(#video-distort)",
                 }}
               >
                 <source src={HERO_VIDEO} type="video/mp4" />
