@@ -15,7 +15,10 @@ import { PROJECTS, STATUS_META, type ProjectStatus } from "./lib/projects";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
-const VIDEOS = ["/videos/100_2605.MOV", "/videos/lake-michigan.mov"];
+// Hero video is H.264 MP4 so it plays in every browser. The original
+// 100_2605.MOV is Motion JPEG, which Chrome can't decode.
+const HERO_VIDEO = "/videos/hero.mp4";
+const HERO_POSTER = "/videos/hero-poster.jpg";
 const LOADER_SEEN_KEY = "abp-loader-seen";
 
 const SURFACES = [
@@ -590,7 +593,8 @@ export default function Home() {
               }}
             >
               <video
-                src={VIDEOS[0]}
+                poster={HERO_POSTER}
+                preload="auto"
                 autoPlay
                 muted
                 loop
@@ -604,7 +608,9 @@ export default function Home() {
                   zIndex: 0,
                   filter: "url(#video-distort)",
                 }}
-              />
+              >
+                <source src={HERO_VIDEO} type="video/mp4" />
+              </video>
               <div
                 aria-hidden
                 style={{

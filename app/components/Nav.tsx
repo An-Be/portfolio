@@ -20,6 +20,11 @@ export default function Nav() {
         justifyContent: "space-between",
         padding: "22px clamp(20px, 5vw, 56px)",
         background: "transparent",
+        // Same trick as Cursor.tsx: difference blending flips the nav's
+        // colors against whatever is underneath, so it stays visible over
+        // the hero video and dark sections. Colors below are pre-inverted
+        // so that on the white page they render exactly as before.
+        mixBlendMode: "difference",
       }}
     >
       <Link
@@ -36,7 +41,9 @@ export default function Nav() {
           alt=""
           width={28}
           height={9.33}
-          style={{ filter: "none", height: "auto" }}
+          // invert + difference cancel out on white, so the logo keeps its
+          // real colors at rest and flips over darker content
+          style={{ filter: "invert(1)", height: "auto" }}
         />
       </Link>
 
@@ -50,7 +57,9 @@ export default function Nav() {
           letterSpacing: "0.08em",
           textDecoration: "none",
           padding: "6px 2px",
-          color: isPlayground ? "var(--accent-red)" : "var(--text-default)",
+          // Inverses of --accent-red (#df2935) and --text-default (#171717),
+          // so they read as red and ink on the white page
+          color: isPlayground ? "#20d6ca" : "#e8e8e8",
         }}
       >
         Playground
