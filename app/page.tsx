@@ -12,12 +12,14 @@ import PaletteDock from "./components/PaletteDock";
 import Loader from "./components/Loader";
 import EntryTable, { type EntryRow } from "./components/EntryTable";
 import { PROJECTS, STATUS_META, type ProjectStatus } from "./lib/projects";
+import { useVideoScrub } from "./lib/useVideoScrub";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
-// Hero video is H.264 MP4 so it plays in every browser. The original
-// 100_2605.MOV is Motion JPEG, which Chrome can't decode.
-const HERO_VIDEO = "/videos/hero.mp4";
+// Hero video is H.264 MP4 so it plays in every browser (the original
+// 100_2605.MOV is Motion JPEG, which Chrome can't decode). Every frame is a
+// keyframe so it can be scrubbed forward and back smoothly.
+const HERO_VIDEO = "/videos/hero-scrub.mp4";
 const HERO_POSTER = "/videos/hero-poster.jpg";
 const LOADER_SEEN_KEY = "abp-loader-seen";
 
@@ -244,6 +246,11 @@ export default function Home() {
     [sent, setSent] = useState(false);
   const mainRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
+  const heroVideoAreaRef = useRef<HTMLDivElement>(null);
+  const heroVideoRef = useRef<HTMLVideoElement>(null);
+
+  // Move across the hero video (or drag on a phone) to scrub through it
+  useVideoScrub(heroVideoAreaRef, heroVideoRef);
 
   // Skip the loader if it already played earlier this session — runs before
   // paint so there's no flash of it on client-side navigations back to "/"
@@ -504,14 +511,18 @@ export default function Home() {
           {/* Video area — fills remaining height */}
           <div style={{ flex: 1 }}>
             <div
+              ref={heroVideoAreaRef}
               style={{
                 position: "relative",
                 overflow: "hidden",
                 height: "100%",
                 background: "#1d2130",
+                // Horizontal drags scrub the video; vertical swipes still scroll
+                touchAction: "pan-y",
               }}
             >
               <video
+                ref={heroVideoRef}
                 poster={HERO_POSTER}
                 preload="auto"
                 autoPlay
