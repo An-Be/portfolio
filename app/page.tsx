@@ -793,7 +793,7 @@ export default function Home() {
                 discovery: figuring out what the problem actually is before I
                 build anything. Most of my side projects started that way.
                 TabMath came from watching a friend struggle to split one check
-                for 13 people. Your Turn came from a Notes app shortcut I was
+                for 13 people. TagYourTurn came from a Notes app shortcut I was
                 using to track who goes first in our daily games.
               </p>
               <p className="t-body-lg">

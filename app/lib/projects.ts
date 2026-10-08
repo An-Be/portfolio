@@ -81,8 +81,8 @@ export const PROJECTS: Project[] = [
     ],
   },
   {
-    id: "your-turn",
-    title: "Your Turn",
+    id: "tag-your-turn",
+    title: "TagYourTurn",
     year: "2026",
     focus: "Rhythm",
     summary:
@@ -93,7 +93,17 @@ export const PROJECTS: Project[] = [
     sections: [
       {
         h: "What it does",
-        p: "One person creates a tracker with two names and gets a secret link to share. The page shows whose turn it is. Tap Done and it flips to the other person. Skip if today's not a day for it, and the turn stays where it is. Swap trades it, and Undo takes back a mistake. Rotating the link kills the old URL if it ever ends up somewhere it shouldn't.",
+        p: "One person creates a tracker with two names and gets a secret link to share. Each phone picks which person it belongs to, no account needed. The page shows whose turn it is. Tap Done and it flips to the other person. Skip if today's not a day for it, and the turn stays where it is. Swap trades it, and either person can fix a day that got logged wrong. Rotating the link kills the old URL if it ever ends up somewhere it shouldn't.",
+      },
+      {
+        h: "Designed so it can't be used against anyone",
+        p: [
+          "A shared log can turn into evidence, so I designed against that from the start. It answers whose turn it is without becoming a way to keep tabs.",
+          "It's mutual. The tracker only exists if both people have the link, so nobody gets tracked without opting in.",
+          "Both people can do everything: Done, Skip, Swap, fix a day, rotate the link. No admin, nobody watching the other.",
+          "It forgets. It only looks back 7 days and figures that out fresh every time, so old stuff just drops off. There's no all-time record to bring up later.",
+          "It never nags. No notifications, no reminders, no \"the other person hasn't logged\" prompts. No streaks, no leaderboards, no exports.",
+        ],
       },
       {
         h: "A few details I cared about",
