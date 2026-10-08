@@ -53,6 +53,7 @@ export const PROJECTS: Project[] = [
     focus: "Fairness",
     summary:
       "Split the bill in 60 seconds. Snap the receipt, tap who had what, send everyone a link with their total. No app, no login for your friends, no money moving through me.",
+    why: "I was out with a group of 13 and the restaurant would only do one check because of our party size. The organizer had a hard time splitting it, so in the end they divided up tax and tip and sent a screenshot of the receipt for each of us to find our own items. It worked, but it should be easier.",
     stack: [
       "Next.js 16",
       "Gemini",
@@ -75,6 +76,33 @@ export const PROJECTS: Project[] = [
           "Participants never create an account. The split lives behind a share token, so finding your name and seeing your total works with no login.",
           "The math is exact to the cent. Tax and tip get prorated by each person's share of the subtotal, and any leftover penny from rounding gets handed out one at a time instead of disappearing or getting double counted.",
           "Rate limiting runs on the same Postgres database instead of a separate Redis instance, since the volume never justified standing up another service.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "your-turn",
+    title: "Your Turn",
+    year: "2026",
+    focus: "Fairness",
+    summary:
+      "Whose turn is it tonight? One shared link for two people, no login. It shows who starts tonight, and one tap flips it for tomorrow.",
+    why: "My wife and I play Wordle, Spotle, and a few other games together and switch who goes first. I was tracking it in my Notes app with a phone shortcut that copies the date on a double tap. It worked, but I wanted a real place for it.",
+    stack: ["Next.js 15", "Prisma + Postgres", "Neon", "Tailwind", "Vercel"],
+    status: "build",
+    sections: [
+      {
+        h: "What it does",
+        p: "One person creates a tracker with two names and gets a secret link to share. Each night the page shows who starts. Tap Done and the starter flips for tomorrow. Skip keeps it the same, Swap trades it for tonight, and Undo takes back a mistake. Rotating the link kills the old URL if it ever ends up somewhere it shouldn't. History and a 30-day split are next, so there's something to point at when we disagree about whose turn it really is.",
+      },
+      {
+        h: "A few details I cared about",
+        p: [
+          "The turn only flips when someone taps Done, never on the calendar. A night we skip doesn't quietly throw the rotation off.",
+          "Two phones tapping at the same time is handled. Every change locks the tracker row inside a transaction, so taps get applied one after the other instead of canceling each other out.",
+          "The link is the login, so it's treated like one: 128-bit random tokens, no referrer sent to other sites, never indexed, and page titles never include names so link previews stay private.",
+          "No keys on the client. The app connects to the database with a role that can only read and write its own three tables, and every build fails if the live database drifts from the schema.",
+          "It uses the same design system as TabMath: monochrome, Space Grotesk and Geist Mono, zero radius, 1px borders. Tiny tools for keeping things fair.",
         ],
       },
     ],
