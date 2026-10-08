@@ -93,7 +93,7 @@ export const PROJECTS: Project[] = [
     sections: [
       {
         h: "What it does",
-        p: "One person creates a tracker with two names and gets a secret link to share. The page shows whose turn it is. Tap Done and it flips to the other person. Skip if today's not a day for it, and the turn stays where it is. Swap trades it, and Undo takes back a mistake. Rotating the link kills the old URL if it ever ends up somewhere it shouldn't. History and a 30-day view are next, so you can look back at how it's been going.",
+        p: "One person creates a tracker with two names and gets a secret link to share. The page shows whose turn it is. Tap Done and it flips to the other person. Skip if today's not a day for it, and the turn stays where it is. Swap trades it, and Undo takes back a mistake. Rotating the link kills the old URL if it ever ends up somewhere it shouldn't. A simple history is next, so you can check when it last happened without anyone keeping score.",
       },
       {
         h: "A few details I cared about",
