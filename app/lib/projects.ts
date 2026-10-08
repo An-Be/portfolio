@@ -84,21 +84,21 @@ export const PROJECTS: Project[] = [
     id: "your-turn",
     title: "Your Turn",
     year: "2026",
-    focus: "Fairness",
+    focus: "Rhythm",
     summary:
-      "Whose turn is it today? One shared link for two people, no login. It shows who starts today, and one tap flips it for tomorrow.",
-    why: "My wife and I play Wordle, Spotle, and a few other games together and switch who goes first. I was tracking it in my Notes app with a phone shortcut that copies the date on a double tap. It worked, but I wanted a real place for it.",
+      "Whose turn is it? One shared link for two people, no login. It shows who's up today, and one tap flips it for next time.",
+    why: "My wife and I play Wordle, Spotle, and a few other games together and switch who goes first. I was tracking it in my Notes app with a phone shortcut that copies the date on a double tap. It worked, but I wanted a real place for it. Once I built it, I realized it works for anything two people take turns on.",
     stack: ["Next.js 15", "Prisma + Postgres", "Neon", "Tailwind", "Vercel"],
     status: "build",
     sections: [
       {
         h: "What it does",
-        p: "One person creates a tracker with two names and gets a secret link to share. Each day the page shows who starts. Tap Done and the starter flips for tomorrow. Skip keeps it the same, Swap trades it for today, and Undo takes back a mistake. Rotating the link kills the old URL if it ever ends up somewhere it shouldn't. History and a 30-day split are next, so there's something to point at when we disagree about whose turn it really is.",
+        p: "One person creates a tracker with two names and gets a secret link to share. The page shows whose turn it is. Tap Done and it flips to the other person. Skip if today's not a day for it, and the turn stays where it is. Swap trades it, and Undo takes back a mistake. Rotating the link kills the old URL if it ever ends up somewhere it shouldn't. History and a 30-day view are next, so you can look back at how it's been going.",
       },
       {
         h: "A few details I cared about",
         p: [
-          "The turn only flips when someone taps Done, never on the calendar. A day we skip doesn't quietly throw the rotation off.",
+          "It doesn't assume things split 50/50. The turn only moves when someone taps Done, so skipping a day, or a week, is fine. It picks up where you left off.",
           "Two phones tapping at the same time is handled. Every change locks the tracker row inside a transaction, so taps get applied one after the other instead of canceling each other out.",
           "The link is the login, so it's treated like one: 128-bit random tokens, no referrer sent to other sites, never indexed, and page titles never include names so link previews stay private.",
           "It uses the same design system as TabMath: monochrome, Space Grotesk and Geist Mono, zero radius, 1px borders. Tiny tools for keeping things fair.",
