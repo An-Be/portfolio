@@ -101,7 +101,6 @@ export const PROJECTS: Project[] = [
           "The turn only flips when someone taps Done, never on the calendar. A night we skip doesn't quietly throw the rotation off.",
           "Two phones tapping at the same time is handled. Every change locks the tracker row inside a transaction, so taps get applied one after the other instead of canceling each other out.",
           "The link is the login, so it's treated like one: 128-bit random tokens, no referrer sent to other sites, never indexed, and page titles never include names so link previews stay private.",
-          "No keys on the client. The app connects to the database with a role that can only read and write its own three tables, and every build fails if the live database drifts from the schema.",
           "It uses the same design system as TabMath: monochrome, Space Grotesk and Geist Mono, zero radius, 1px borders. Tiny tools for keeping things fair.",
         ],
       },
