@@ -794,7 +794,7 @@ export default function Home() {
                 build anything. Most of my side projects started that way.
                 TabMath came from watching a friend struggle to split one check
                 for 13 people. Your Turn came from a Notes app shortcut I was
-                using to track who goes first in our nightly games.
+                using to track who goes first in our daily games.
               </p>
               <p className="t-body-lg">
                 I do the same thing at work. I started out shipping front-end
