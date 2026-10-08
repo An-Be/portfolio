@@ -789,32 +789,34 @@ export default function Home() {
                 <Brush color="var(--accent-blue)">and</Brush> build it
               </h2>
               <p className="t-body-lg" style={{ marginTop: 0 }}>
-                I&apos;m Andrea. I work where engineering meets go-to-market:
-                translating complex products into systems that technical and
-                non-technical stakeholders can both trust. I started out
-                shipping production front-end at American Express; now at
-                Stripe, I architect the demo environments and self-serve tools
-                that let global sales and solutions-architecture teams sell
-                complex products without needing an engineer in the room.
+                I&apos;m Andrea. The part of the work I care about most is
+                discovery: figuring out what the problem actually is before I
+                build anything. Most of my side projects started that way.
+                TabMath came from watching a friend struggle to split one check
+                for 13 people. Your Turn came from a Notes app shortcut I was
+                using to track who goes first in our nightly games.
               </p>
               <p className="t-body-lg">
-                That work has helped influence $265M+ (and climbing) in pipeline
-                across 2025 and 2026. I care about the layer most companies
-                leave to chance: the one between what engineering built and the
-                people who have to sell it, demo it, and trust it. That&apos;s
-                where I do my best work.
+                I do the same thing at work. I started out shipping front-end
+                at American Express. Now at Stripe, I build the demo
+                environments and self-serve tools that sales and solutions
+                architects use to show complex products without an engineer in
+                the room. When a demo request comes in, I meet with product,
+                solutions architects, and product marketing to figure out what
+                we actually need to build, and we scope from there. That work
+                has helped influence $265M+ in pipeline across 2025 and 2026.
               </p>
 
               <div style={divider} />
 
               <span className="t-label eyebrow">What I Build</span>
               <p className="t-body-lg" style={{ marginTop: 18 }}>
-                Day to day, I own demo experiences across Stripe&apos;s product
-                surface: Agentic, Billing, Payments, Connect, Terminal, and
-                everything in between. Global events, enterprise GTM calls, and
-                the self-serve tools that let sales teams run without an
-                engineer in the room. Every product has its own constraints,
-                audience, and failure modes. That's the part I actually enjoy.
+                I own demo experiences across Stripe&apos;s products: Agentic,
+                Billing, Payments, Connect, Terminal, and everything in between.
+                Global events, enterprise calls, and tools sales teams run on
+                their own. Every product has a different audience and a
+                different way of going wrong. Figuring that out is the part I
+                enjoy.
               </p>
               <div
                 style={{
