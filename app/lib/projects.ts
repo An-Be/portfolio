@@ -118,6 +118,7 @@ export const PROJECTS: Project[] = [
     why: "My wife and I play Wordle, Spotle, and a few other games together and switch who goes first. I was tracking it in my Notes app with a phone shortcut that copies the date on a double tap. It worked, but I wanted a real place for it. Once I built it, I realized it works for anything two people take turns on.",
     stack: ["Next.js 16", "Prisma + Postgres", "Neon", "Tailwind", "Vercel"],
     status: "shipped",
+    icon: "/images/tag-your-turn-icon.png",
     url: "tagyourturn.com",
     sections: [
       {
