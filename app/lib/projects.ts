@@ -81,6 +81,34 @@ export const PROJECTS: Project[] = [
     ],
   },
   {
+    id: "picture-of-the-day",
+    title: "Picture of the Day",
+    year: "2023",
+    focus: "Curiosity",
+    summary:
+      "NASA's Astronomy Picture of the Day: one image of the universe every day, with the story behind it.",
+    why: "It was one of the first React apps I ever built, back when I was figuring out how to call an API for the first time. In 2026 I came back to it and rebuilt it on the same shared template as my other tiny tools.",
+    stack: ["Next.js 16", "TypeScript", "Tailwind", "NASA APOD API", "Vercel"],
+    status: "shipped",
+    icon: "/images/apod-icon.png",
+    url: "astrononomy-picture-of-day.vercel.app",
+    sections: [
+      {
+        h: "Then and now",
+        p: "The first version was a Create React App in plain JavaScript that called NASA straight from the browser, API key and all. The rebuild moves it to Next.js 16 and TypeScript on my tool-template, the same base TabMath and TagYourTurn use, so it shares their design system, security defaults, and tests.",
+      },
+      {
+        h: "A few details I cared about",
+        p: [
+          "The NASA request runs on the server now, so the API key never ships to the browser. Responses are cached for an hour.",
+          "Midway through the rebuild, NASA moved APOD to a new API with a different shape. The app picks the newest entry, pulls the image from its new home, and turns NASA's HTML credits and explanations into plain text instead of injecting raw HTML.",
+          "Images, YouTube and Vimeo embeds, and NASA-hosted videos each render their own way. Anything unexpected falls back to a link to NASA's page instead of breaking.",
+          "New mark: a planet rising inside a picture frame, drawn to still read at 16px as a favicon.",
+        ],
+      },
+    ],
+  },
+  {
     id: "tag-your-turn",
     title: "TagYourTurn",
     year: "2026",

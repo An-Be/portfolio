@@ -171,6 +171,17 @@ function Marquee() {
                 flexShrink: 0,
               }}
             />
+            <Image
+              src="/images/apod-mark.svg"
+              alt=""
+              width={16}
+              height={16}
+              aria-hidden="true"
+              style={{
+                display: "block",
+                flexShrink: 0,
+              }}
+            />
           </span>
         ))}
       </div>
