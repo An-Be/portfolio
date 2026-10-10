@@ -116,8 +116,9 @@ export const PROJECTS: Project[] = [
     summary:
       "Whose turn is it? One shared link for two people, no login. It shows who's up today, and one tap flips it for next time.",
     why: "My wife and I play Wordle, Spotle, and a few other games together and switch who goes first. I was tracking it in my Notes app with a phone shortcut that copies the date on a double tap. It worked, but I wanted a real place for it. Once I built it, I realized it works for anything two people take turns on.",
-    stack: ["Next.js 15", "Prisma + Postgres", "Neon", "Tailwind", "Vercel"],
-    status: "build",
+    stack: ["Next.js 16", "Prisma + Postgres", "Neon", "Tailwind", "Vercel"],
+    status: "shipped",
+    url: "tagyourturn.com",
     sections: [
       {
         h: "What it does",
