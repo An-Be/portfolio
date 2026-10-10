@@ -154,23 +154,40 @@ function Marquee() {
               letterSpacing: "0.12em",
               textTransform: "uppercase",
               color: "var(--palette-gray-900)",
-              paddingRight: 36,
+              paddingRight: 30,
             }}
           >
             {items.map((item, i) => (
               <span key={i}>{item}</span>
             ))}
-            <Image
-              src="/images/tab-math-mark.svg"
-              alt=""
-              width={16}
-              height={16}
-              aria-hidden="true"
+            {/* Project marks sit in their own group with wide space on both
+                sides, so they don't read as part of the text before them. */}
+            <span
               style={{
-                display: "block",
-                flexShrink: 0,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 18,
+                paddingInline: 56,
               }}
-            />
+            >
+              {[
+                "/images/tab-math-mark.svg",
+                "/images/tag-your-turn-mark.svg",
+                "/images/apod-mark.svg",
+              ].map(
+                (src) => (
+                  <Image
+                    key={src}
+                    src={src}
+                    alt=""
+                    width={16}
+                    height={16}
+                    aria-hidden="true"
+                    style={{ display: "block", flexShrink: 0 }}
+                  />
+                ),
+              )}
+            </span>
           </span>
         ))}
       </div>

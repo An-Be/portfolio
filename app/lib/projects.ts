@@ -81,6 +81,34 @@ export const PROJECTS: Project[] = [
     ],
   },
   {
+    id: "picture-of-the-day",
+    title: "Picture of the Day",
+    year: "2023",
+    focus: "Curiosity",
+    summary:
+      "NASA's Astronomy Picture of the Day: one image of the universe every day, with the story behind it.",
+    why: "It was one of the first React apps I ever built, back when I was figuring out how to call an API for the first time. In 2026 I came back to it and rebuilt it on the same shared template as my other tiny tools.",
+    stack: ["Next.js 16", "TypeScript", "Tailwind", "NASA APOD API", "Vercel"],
+    status: "shipped",
+    icon: "/images/apod-icon.png",
+    url: "apodaily.vercel.app",
+    sections: [
+      {
+        h: "Then and now",
+        p: "The first version was a Create React App in plain JavaScript that called NASA straight from the browser, API key and all. The rebuild moves it to Next.js 16 and TypeScript on my tool-template, the same base TabMath and TagYourTurn use, so it shares their design system, security defaults, and tests.",
+      },
+      {
+        h: "A few details I cared about",
+        p: [
+          "The NASA request runs on the server now, so the API key never ships to the browser. Responses are cached for an hour.",
+          "Midway through the rebuild, NASA moved APOD to a new API with a different shape. The app picks the newest entry, pulls the image from its new home, and turns NASA's HTML credits and explanations into plain text instead of injecting raw HTML.",
+          "Images, YouTube and Vimeo embeds, and NASA-hosted videos each render their own way. Anything unexpected falls back to a link to NASA's page instead of breaking.",
+          "New mark: a planet rising inside a picture frame, drawn to still read at 16px as a favicon.",
+        ],
+      },
+    ],
+  },
+  {
     id: "tag-your-turn",
     title: "TagYourTurn",
     year: "2026",
@@ -88,8 +116,10 @@ export const PROJECTS: Project[] = [
     summary:
       "Whose turn is it? One shared link for two people, no login. It shows who's up today, and one tap flips it for next time.",
     why: "My wife and I play Wordle, Spotle, and a few other games together and switch who goes first. I was tracking it in my Notes app with a phone shortcut that copies the date on a double tap. It worked, but I wanted a real place for it. Once I built it, I realized it works for anything two people take turns on.",
-    stack: ["Next.js 15", "Prisma + Postgres", "Neon", "Tailwind", "Vercel"],
-    status: "build",
+    stack: ["Next.js 16", "Prisma + Postgres", "Neon", "Tailwind", "Vercel"],
+    status: "shipped",
+    icon: "/images/tag-your-turn-icon.png",
+    url: "tagyourturn.com",
     sections: [
       {
         h: "What it does",
@@ -132,8 +162,7 @@ export const PROJECTS: Project[] = [
       "react-pdf",
       "Vercel Cron",
     ],
-    status: "paused",
-    note: "Spec complete, parked while TabMath ships.",
+    status: "build",
     sections: [
       {
         h: "What it does",
