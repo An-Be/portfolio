@@ -162,8 +162,7 @@ export const PROJECTS: Project[] = [
       "react-pdf",
       "Vercel Cron",
     ],
-    status: "paused",
-    note: "Spec complete, parked while TabMath ships.",
+    status: "build",
     sections: [
       {
         h: "What it does",
