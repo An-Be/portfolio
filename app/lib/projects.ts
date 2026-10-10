@@ -91,7 +91,7 @@ export const PROJECTS: Project[] = [
     stack: ["Next.js 16", "TypeScript", "Tailwind", "NASA APOD API", "Vercel"],
     status: "shipped",
     icon: "/images/apod-icon.png",
-    url: "astrononomy-picture-of-day.vercel.app",
+    url: "apodaily.vercel.app",
     sections: [
       {
         h: "Then and now",
