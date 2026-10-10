@@ -170,7 +170,11 @@ function Marquee() {
                 paddingInline: 56,
               }}
             >
-              {["/images/tab-math-mark.svg", "/images/apod-mark.svg"].map(
+              {[
+                "/images/tab-math-mark.svg",
+                "/images/tag-your-turn-mark.svg",
+                "/images/apod-mark.svg",
+              ].map(
                 (src) => (
                   <Image
                     key={src}
