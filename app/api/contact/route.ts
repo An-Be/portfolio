@@ -4,11 +4,11 @@ import { parseContact } from "../../lib/contact";
 // Env (Vercel, server-only):
 //   RESEND_API_KEY  required
 //   CONTACT_TO      defaults to info@andreaberrocal.com
-//   CONTACT_FROM    defaults to "Portfolio <noreply@andreaberrocal.com>";
+//   CONTACT_FROM    defaults to "Portfolio <contact@andreaberrocal.com>";
 //                   the domain must be verified in Resend.
 
 const TO = process.env.CONTACT_TO ?? "info@andreaberrocal.com";
-const FROM = process.env.CONTACT_FROM ?? "Portfolio <noreply@andreaberrocal.com>";
+const FROM = process.env.CONTACT_FROM ?? "Portfolio <contact@andreaberrocal.com>";
 
 function json(body: unknown, status: number) {
   return Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
