@@ -258,7 +258,10 @@ export default function Home() {
   const [name, setName] = useState(""),
     [email, setEmail] = useState(""),
     [msg, setMsg] = useState(""),
-    [sent, setSent] = useState(false);
+    [sent, setSent] = useState(false),
+    [sending, setSending] = useState(false),
+    [sendError, setSendError] = useState(""),
+    [website, setWebsite] = useState("");
   const mainRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
 
@@ -978,9 +981,28 @@ export default function Home() {
                 </div>
               ) : (
                 <form
-                  onSubmit={(e) => {
+                  onSubmit={async (e) => {
                     e.preventDefault();
-                    setSent(true);
+                    if (sending) return;
+                    setSending(true);
+                    setSendError("");
+                    try {
+                      const res = await fetch("/api/contact", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ name, email, message: msg, website }),
+                      });
+                      if (res.ok) {
+                        setSent(true);
+                        return;
+                      }
+                      const data = (await res.json().catch(() => ({}))) as { error?: string };
+                      setSendError(data.error ?? "The form isn't working right now.");
+                    } catch {
+                      setSendError("Couldn't send. Check your connection and try again.");
+                    } finally {
+                      setSending(false);
+                    }
                   }}
                   style={{
                     display: "flex",
@@ -1002,6 +1024,23 @@ export default function Home() {
                     value={msg}
                     onChange={setMsg}
                   />
+                  {/* Honeypot: hidden from people and screen readers; bots fill it in. */}
+                  <input
+                    type="text"
+                    name="website"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                    style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
+                  />
+                  {sendError && (
+                    <p className="t-body" role="alert" style={{ margin: 0 }}>
+                      {sendError} You can also email{" "}
+                      <a href="mailto:info@andreaberrocal.com">info@andreaberrocal.com</a>.
+                    </p>
+                  )}
                   <div
                     className="contact-actions"
                     style={{
@@ -1012,7 +1051,7 @@ export default function Home() {
                     }}
                   >
                     <Button variant="primary" type="submit">
-                      Send it
+                      {sending ? "Sending…" : "Send it"}
                     </Button>
                     <span className="t-caption">
                       or email info@andreaberrocal.com
