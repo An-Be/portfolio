@@ -174,6 +174,7 @@ function Marquee() {
                 "/images/tab-math-mark.svg",
                 "/images/tag-your-turn-mark.svg",
                 "/images/apod-mark.svg",
+                "/images/wraparty-mark.svg",
               ].map(
                 (src) => (
                   <Image

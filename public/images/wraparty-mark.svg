@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -8 48 48" width="16" height="16">
+  <defs>
+    <mask id="wraparty-gap">
+      <rect x="0" y="-8" width="48" height="48" fill="#fff"/>
+      <path d="M22 6 L34 27 L44 5" fill="none" stroke="#000" stroke-width="12" stroke-linejoin="round" stroke-linecap="round"/>
+    </mask>
+  </defs>
+  <g fill="none" stroke="#171717" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M4 5 L14 27 L26 6" mask="url(#wraparty-gap)"/>
+    <path d="M22 6 L34 27 L44 5"/>
+  </g>
+</svg>
