@@ -147,6 +147,36 @@ export const PROJECTS: Project[] = [
     ],
   },
   {
+    id: "wraparty",
+    title: "Wraparty",
+    year: "2026",
+    focus: "Play",
+    summary:
+      "A new game every day. You get two people and connect them through the movies they made or were in, in as few links as you can. Same pair for everyone, scored against par.",
+    why: "I love playing games like Wordle, Spotle and Connections, and wanted to make my own.",
+    stack: ["Next.js 16", "TypeScript", "Prisma 7 + Postgres", "Neon", "TMDB API", "Vercel"],
+    status: "build",
+    icon: "/images/wraparty-icon.png",
+    url: "wraparty.com",
+    note: "Movies is built and in testing. More games are on the way.",
+    sections: [
+      {
+        h: "What it does",
+        p: "Every day there's one pair, the same for everyone. Start from the first person, pick a movie they acted in or directed, then someone else from that movie, and keep going until you reach the second person. Fewer links is better, and your score is a tier against par: Under par, Par or Over par. Share your result as a little grid, then come back tomorrow.",
+      },
+      {
+        h: "A few details I cared about",
+        p: [
+          "Facts, not vibes. Every link is checked against real TMDB credits on the server. Acting in a real role or directing counts; showing up as yourself in a documentary doesn't.",
+          "Par is computed once when puzzles are scheduled, with a search over a bounded slice of the movie graph, so the game never runs that search while you play.",
+          "Picking a movie the target is in finishes the game on the spot, since naming them would be a step with only one right answer.",
+          "It's built as an engine, not a one-off. Movies is the first mode, and the chain logic doesn't know it's about movies, so the next game is new data, not a rewrite.",
+          "No login. Streaks and stats live on your device, and solves are anonymous counts.",
+        ],
+      },
+    ],
+  },
+  {
     id: "pet-intake-tracker",
     title: "Pawperwork",
     year: "2026",
