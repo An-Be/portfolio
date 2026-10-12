@@ -101,7 +101,7 @@ export const PROJECTS: Project[] = [
         h: "A few details I cared about",
         p: [
           "The NASA request runs on the server now, so the API key never ships to the browser. Responses are cached for an hour.",
-          "Midway through the rebuild, NASA moved APOD to a new API with a different shape. The app picks the newest entry, pulls the image from its new home, and turns NASA's HTML credits and explanations into plain text instead of injecting raw HTML.",
+          "At some point NASA had moved APOD to a new API with a different shape, and I only found out when I started the rebuild. The app now uses the new API: it picks the newest entry, pulls the image from its new home, and turns NASA's HTML credits and explanations into plain text instead of injecting raw HTML.",
           "Images, YouTube and Vimeo embeds, and NASA-hosted videos each render their own way. Anything unexpected falls back to a link to NASA's page instead of breaking.",
           "New mark: a planet rising inside a picture frame, drawn to still read at 16px as a favicon.",
         ],
