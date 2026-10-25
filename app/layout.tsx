@@ -21,12 +21,30 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const SITE_DESCRIPTION =
+  "I make complex products legible, to buyers, sellers, and everyone in between.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL("https://andreaberrocal.com"),
   title: {
     default: "Andrea Berrocal",
     template: "%s | Andrea Berrocal",
   },
-  description: "I make complex products legible, to buyers, sellers, and everyone in between.",
+  description: SITE_DESCRIPTION,
+  // Link-preview image comes from app/opengraph-image.png and
+  // app/twitter-image.png (Next.js file conventions).
+  openGraph: {
+    type: "website",
+    siteName: "Andrea Berrocal",
+    title: "Andrea Berrocal",
+    description: SITE_DESCRIPTION,
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Andrea Berrocal",
+    description: SITE_DESCRIPTION,
+  },
   icons: {
     icon: "/images/icon.svg",
     shortcut: "/images/icon.svg",
