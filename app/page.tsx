@@ -93,12 +93,12 @@ const LOGOS: Logo[] = [
 const timeline = [
   {
     year: "2024",
-    role: "Software Engineer, GTM and Marketing · Stripe",
+    role: "Demo Engineer, Marketing and GTM · Stripe",
     note: "Architecting AI-powered demo systems: Agentic Commerce, Demo Hub, and 8+ global enterprise events a year. Chicago.",
   },
   {
     year: "2022",
-    role: "Software Engineer · American Express",
+    role: "Front-end Software Engineer · American Express",
     note: "Built the Ask Amex customer-service chat UI in React & Redux, with real-time WebSocket messaging. Phoenix.",
   },
 ];
@@ -728,11 +728,11 @@ export default function Home() {
               //   label: "Dory · mascot",
               // },
               {
-                src: "/images/mim-postcard.png",
+                src: "/images/mim-postcard.jpg",
                 label: "MIM · postcard · SAIC coursework",
               },
               {
-                src: "/images/mim-business-card.png",
+                src: "/images/mim-business-card.jpg",
                 label: "MIM · business card · SAIC coursework",
               },
               {
@@ -767,16 +767,12 @@ export default function Home() {
                   overflow: "hidden",
                 }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={src}
                   alt={label}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    display: "block",
-                  }}
+                  fill
+                  sizes="100vw"
+                  style={{ objectFit: "cover" }}
                 />
                 <figcaption
                   className="t-caption"
