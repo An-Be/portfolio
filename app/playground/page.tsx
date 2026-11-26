@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import PageShell from "../components/PageShell";
 import Brush from "../components/Brush";
 
@@ -28,6 +29,18 @@ export default function PlaygroundPage() {
         <p className="t-caption" style={{ marginTop: 6 }}>
           Check back soon.
         </p>
+        <Link
+          href="/"
+          className="t-label"
+          style={{
+            marginTop: 18,
+            color: "var(--text-default)",
+            textDecoration: "underline",
+            textUnderlineOffset: 4,
+          }}
+        >
+          ← Back home
+        </Link>
       </div>
     </PageShell>
   );

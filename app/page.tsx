@@ -21,6 +21,20 @@ const HERO_VIDEO = "/videos/hero.mp4";
 const HERO_POSTER = "/videos/hero-poster.jpg";
 const LOADER_SEEN_KEY = "abp-loader-seen";
 
+// Creative gallery. The page Loader preloads these so they're ready by the
+// time someone scrolls to the gallery.
+const GALLERY = [
+  // { src: "/images/cr-mascot.png", label: "Dory · mascot" },
+  { src: "/images/mim-postcard.jpg", label: "MIM · postcard · SAIC coursework" },
+  { src: "/images/mim-business-card.jpg", label: "MIM · business card · SAIC coursework" },
+  { src: "/images/bose-headset.jpg", label: "Bose · product study" },
+  { src: "/images/bose-me.jpg", label: "Bose · portrait" },
+  { src: "/images/river-under-bridge.jpg", label: "Riverwalk · Clark Street bridge" },
+  { src: "/images/river-stairs.jpg", label: "Riverwalk steps · Chicago, winter" },
+  { src: "/images/river-ice.jpg", label: "Chicago River · ice, in pieces" },
+];
+const GALLERY_SIZES = "100vw";
+
 const SURFACES = [
   "Link Agent Wallet",
   "UCP",
@@ -460,6 +474,8 @@ export default function Home() {
     <>
       {!loaded && (
         <Loader
+          preload={GALLERY.map((g) => g.src)}
+          sizes={GALLERY_SIZES}
           onDone={() => {
             sessionStorage.setItem(LOADER_SEEN_KEY, "1");
             setLoaded(true);
@@ -722,40 +738,7 @@ export default function Home() {
             className="creative-track"
             style={{ display: "flex", willChange: "transform" }}
           >
-            {[
-              // {
-              //   src: "/images/cr-mascot.png",
-              //   label: "Dory · mascot",
-              // },
-              {
-                src: "/images/mim-postcard.jpg",
-                label: "MIM · postcard · SAIC coursework",
-              },
-              {
-                src: "/images/mim-business-card.jpg",
-                label: "MIM · business card · SAIC coursework",
-              },
-              {
-                src: "/images/bose-headset.jpg",
-                label: "Bose · product study",
-              },
-              {
-                src: "/images/bose-me.jpg",
-                label: "Bose · portrait",
-              },
-              {
-                src: "/images/river-under-bridge.jpg",
-                label: "Riverwalk · Clark Street bridge",
-              },
-              {
-                src: "/images/river-stairs.jpg",
-                label: "Riverwalk steps · Chicago, winter",
-              },
-              {
-                src: "/images/river-ice.jpg",
-                label: "Chicago River · ice, in pieces",
-              },
-            ].map(({ src, label }) => (
+            {GALLERY.map(({ src, label }) => (
               <figure
                 key={src}
                 style={{
@@ -771,7 +754,8 @@ export default function Home() {
                   src={src}
                   alt={label}
                   fill
-                  sizes="100vw"
+                  sizes={GALLERY_SIZES}
+                  loading="eager"
                   style={{ objectFit: "cover" }}
                 />
                 <figcaption
