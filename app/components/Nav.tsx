@@ -47,8 +47,9 @@ export default function Nav() {
         />
       </Link>
 
+      {/* On the playground, this link swaps to a way back home */}
       <Link
-        href="/playground"
+        href={isPlayground ? "/" : "/playground"}
         style={{
           fontFamily: "var(--font-mono)",
           textTransform: "uppercase",
@@ -57,12 +58,12 @@ export default function Nav() {
           letterSpacing: "0.08em",
           textDecoration: "none",
           padding: "6px 2px",
-          // Inverses of --accent-red (#df2935) and --text-default (#171717),
-          // so they read as red and ink on the white page
-          color: isPlayground ? "#20d6ca" : "#e8e8e8",
+          // Inverse of --text-default (#171717), so it reads as ink on the
+          // white page
+          color: "#e8e8e8",
         }}
       >
-        Playground
+        {isPlayground ? "← Home" : "Playground"}
       </Link>
     </nav>
   );
